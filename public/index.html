@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatConnect - Global Gaming Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #18191c;
+      color: #e0e0e0;
+    }
+
+    .hero-text-gradient {
+      background: linear-gradient(90deg, #5865F2, #00a8fc, #5865F2);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: text-shine 5s linear infinite;
+    }
+
+    @keyframes text-shine {
+      to { background-position: 200% center; }
+    }
+
+    .main-bg {
+        background-image: radial-gradient(circle at 1px 1px, #2f3136 1px, transparent 0);
+        background-size: 25px 25px;
+    }
+
+    .feature-card {
+        background-color: #202225;
+        border: 1px solid #2f3136;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    #contactModal {
+        transition: opacity 0.3s ease;
+    }
+    #contactModal textarea {
+        resize: none;
+    }
+
+    /* Styles for mobile menu transition */
+    #mobileMenu {
+        transition: transform 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="main-bg">
+
+  <header class="bg-[#18191c]/80 backdrop-blur-sm border-b border-gray-800 fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="text-2xl font-bold text-white">
+        Chat<span class="text-blue-500">Connect</span>
+      </a>
+      
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a id="desktopContactLink" href="#" class="text-gray-300 hover:text-white transition-colors">Contact</a>
+        <div id="authLinks" class="flex items-center gap-4 bg-white p-2 rounded-md">
+          <a href="loginsignup.html" class="text-black">Sign In</a>
+          <a href="loginsignup.html" class="bg-blue-600 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors">
+            Sign Up
+          </a>
+        </div>
+        <div id="userProfile" class="hidden items-center gap-4"></div>
+      </nav>
+
+      <!-- Hamburger Menu Button -->
+      <div class="md:hidden">
+        <button id="menuBtn" class="text-white focus:outline-none" aria-label="Open menu" aria-expanded="false">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="md:hidden fixed inset-0 bg-[#18191c]/95 backdrop-blur-lg z-40 transform -translate-x-full">
+        <div class="flex justify-end p-6">
+            <button id="closeMenuBtn" class="text-white focus:outline-none" aria-label="Close menu">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <nav class="flex flex-col items-center justify-center h-full -mt-16 space-y-8 text-xl">
+            <a id="mobileContactLink" href="#" class="text-gray-300 hover:text-white transition-colors">Contact</a>
+             <div id="mobileAuthLinks" class="flex flex-col items-center gap-6">
+                <a href="loginsignup.html" class="text-gray-300">Sign In</a>
+                <a href="loginsignup.html" class="bg-blue-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors">
+                    Sign Up
+                </a>
+             </div>
+            <div id="mobileUserProfile" class="hidden flex-col items-center gap-6"></div>
+        </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="min-h-screen flex items-center justify-center text-center pt-32 pb-16 md:pt-20">
+      <div class="container mx-auto px-6">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-4 hero-text-gradient">
+          The Ultimate Hub for Global Chat
+        </h1>
+        <p class="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-8">
+          Connect with gamers and friends from around the world in real-time. Secure, fast, and built for communication.
+        </p>
+        <a href="chat.html" class="bg-blue-600 text-white px-7 py-3 md:px-8 md:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+          Get Started
+        </a>
+      </div>
+    </section>
+
+    <section class="py-20 bg-[#202225]">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl sm:text-4xl font-bold text-white">Why ChatConnect?</h2>
+          <p class="text-gray-400 mt-2">Everything you need for seamless communication.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="feature-card p-6 md:p-8 rounded-lg text-center">
+            <div class="flex items-center justify-center h-16 w-16 bg-gray-800 rounded-full mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3"></path></svg></div>
+            <h3 class="text-xl font-semibold text-white mb-2">Global Chat Rooms</h3>
+            <p class="text-gray-400">Jump into a single, massive chat room and talk with people from all over the globe instantly.</p>
+          </div>
+          <div class="feature-card p-6 md:p-8 rounded-lg text-center">
+            <div class="flex items-center justify-center h-16 w-16 bg-gray-800 rounded-full mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+            <h3 class="text-xl font-semibold text-white mb-2">Real-Time Messaging</h3>
+            <p class="text-gray-400">Powered by WebSockets for lightning-fast message delivery. See messages the moment they're sent.</p>
+          </div>
+          <div class="feature-card p-6 md:p-8 rounded-lg text-center">
+            <div class="flex items-center justify-center h-16 w-16 bg-gray-800 rounded-full mx-auto mb-4"><svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+            <h3 class="text-xl font-semibold text-white mb-2">Gamer Avatars</h3>
+            <p class="text-gray-400">Your identity is represented by a unique, auto-generated gaming avatar that sets you apart.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Get Started in Seconds</h2>
+                <p class="text-gray-400 mt-2">A simple, straightforward process.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-4">
+                    <div class="flex items-center justify-center h-16 w-16 border-2 border-blue-500 text-blue-500 rounded-full mx-auto mb-4 text-2xl font-bold">1</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Create an Account</h3>
+                    <p class="text-gray-400">Sign up quickly with just a username, email, and password.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-center justify-center h-16 w-16 border-2 border-blue-500 text-blue-500 rounded-full mx-auto mb-4 text-2xl font-bold">2</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Join The Chat</h3>
+                    <p class="text-gray-400">You're automatically placed in the global chat room after logging in.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-center justify-center h-16 w-16 border-2 border-blue-500 text-blue-500 rounded-full mx-auto mb-4 text-2xl font-bold">3</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Connect & Play</h3>
+                    <p class="text-gray-400">Start talking with other gamers, make friends, and coordinate your next match.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-[#202225]">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Join the Conversation?</h2>
+            <p class="text-gray-400 text-lg mb-8">Your next teammate is waiting. Sign up now and start connecting.</p>
+            <a href="loginsignup.html" class="bg-blue-600 text-white px-7 py-3 md:px-8 md:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+                Create Your Free Account
+            </a>
+        </div>
+    </section>
+  </main>
+
+  <footer class="bg-[#18191c] border-t border-gray-800">
+    <div class="container mx-auto px-6 py-6 text-center text-gray-500">
+      <p>&copy; 2025 ChatConnect. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="contactModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden opacity-0">
+    <div class="bg-[#2f3136] rounded-lg shadow-xl w-full max-w-lg p-6 sm:p-8 relative">
+        <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+        </button>
+        <h3 class="text-2xl font-bold text-white mb-6">Contact Us</h3>
+        <form id="contactForm" class="space-y-4">
+            <div>
+                <label for="gamertag" class="block text-sm font-medium text-gray-300 mb-1">Gamertag / Name</label>
+                <input type="text" id="gamertag" name="gamertag" placeholder="Your in-game name or alias" required class="w-full p-3 rounded-md bg-[#202225] border border-[#202225] text-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition">
+            </div>
+            <div>
+                <label for="query" class="block text-sm font-medium text-gray-300 mb-1">Your Query</label>
+                <textarea id="query" name="query" rows="4" placeholder="Feedback, questions, or bug reports..." required class="w-full p-3 rounded-md bg-[#202225] border border-[#202225] text-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition"></textarea>
+            </div>
+            <div class="flex justify-end pt-4">
+                <button type="submit" class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105">
+                    <span class="absolute w-0 h-0 transition-all duration-300 ease-out bg-white/20 rounded-full group-hover:w-32 group-hover:h-32 opacity-10"></span>
+                    <span class="relative flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Send Message
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- HAMBURGER MENU LOGIC ---
+      const menuBtn = document.getElementById('menuBtn');
+      const closeMenuBtn = document.getElementById('closeMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      const openMenu = () => {
+        mobileMenu.classList.remove('-translate-x-full');
+        menuBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeMenu = () => {
+        mobileMenu.classList.add('-translate-x-full');
+        menuBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      };
+      
+      menuBtn.addEventListener('click', openMenu);
+      closeMenuBtn.addEventListener('click', closeMenu);
+
+      // --- AUTHENTICATION & UI LOGIC ---
+      const token = localStorage.getItem("chatconnect_token");
+      const user = JSON.parse(localStorage.getItem("chatconnect_user") || "{}");
+      
+      // Desktop elements
+      const authLinks = document.getElementById('authLinks');
+      const userProfile = document.getElementById('userProfile');
+      
+      // Mobile elements
+      const mobileAuthLinks = document.getElementById('mobileAuthLinks');
+      const mobileUserProfile = document.getElementById('mobileUserProfile');
+
+      if (token && user.name) {
+        // Show user profile on both desktop and mobile
+        authLinks.classList.add('hidden');
+        userProfile.classList.remove('hidden');
+        userProfile.classList.add('flex');
+        userProfile.innerHTML = `
+          <span class="text-gray-300">Welcome, ${user.name}</span>
+          <img class="w-10 h-10 rounded-full" src="https://api.dicebear.com/8.x/adventurer/svg?seed=${user.name}&backgroundColor=transparent" alt="User Avatar">
+          <a href="chat.html" class="bg-blue-600 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors">
+            Go to Chat
+          </a>
+        `;
+        
+        mobileAuthLinks.classList.add('hidden');
+        mobileUserProfile.classList.remove('hidden');
+        mobileUserProfile.classList.add('flex');
+        mobileUserProfile.innerHTML = `
+            <span class="text-gray-300 text-2xl">Welcome, ${user.name}</span>
+            <img class="w-20 h-20 rounded-full border-2 border-blue-500" src="https://api.dicebear.com/8.x/adventurer/svg?seed=${user.name}&backgroundColor=transparent" alt="User Avatar">
+            <a href="chat.html" class="bg-blue-600 text-white px-8 py-3 rounded-md text-xl font-semibold hover:bg-blue-700 transition-colors">
+                Go to Chat
+            </a>
+        `;
+      } else {
+        // Show sign-in/up links on both
+        authLinks.classList.remove('hidden');
+        userProfile.classList.add('hidden');
+        mobileAuthLinks.classList.remove('hidden');
+        mobileUserProfile.classList.add('hidden');
+      }
+
+      // --- CONTACT MODAL LOGIC ---
+      const contactModal = document.getElementById('contactModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const contactForm = document.getElementById('contactForm');
+      
+      // Both desktop and mobile links should open the same modal
+      const contactLinks = [document.getElementById('desktopContactLink'), document.getElementById('mobileContactLink')];
+
+      const openContactModal = () => {
+        contactModal.classList.remove('hidden');
+        setTimeout(() => contactModal.classList.remove('opacity-0'), 10);
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeContactModal = () => {
+        contactModal.classList.add('opacity-0');
+        setTimeout(() => contactModal.classList.add('hidden'), 300);
+        // Only restore body scroll if mobile menu is not also open
+        if (mobileMenu.classList.contains('-translate-x-full')) {
+            document.body.style.overflow = '';
+        }
+      };
+      
+      contactLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMenu(); // Close mobile menu if it's open
+            openContactModal();
+        });
+      });
+
+      closeModalBtn.addEventListener('click', closeContactModal);
+
+      contactModal.addEventListener('click', (e) => {
+          if(e.target === contactModal) {
+              closeContactModal();
+          }
+      });
+
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const gamertag = document.getElementById('gamertag').value;
+        const query = document.getElementById('query').value;
+        console.log({ gamertag, query });
+        // Use a custom modal for alerts later if needed
+        alert('Thank you for your message! We will get back to you shortly.');
+        contactForm.reset();
+        closeContactModal();
+      });
+    });
+  </script>
+</body>
+</html>
