@@ -11,15 +11,27 @@
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
+    :root {
+      /* This CSS variable will be set by JavaScript to the actual visible height */
+      --app-height: 100vh;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #18191c;
+      /* Use the dynamic height variable */
+      height: var(--app-height);
     }
     
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #202225; }
     ::-webkit-scrollbar-thumb { background-color: #2f3136; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background-color: #3b3e44; }
+    
+    /* Prevents pull-to-refresh on the chat box */
+    #chatBox {
+      overscroll-behavior: contain;
+    }
 
     @keyframes message-in {
       from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -56,10 +68,10 @@
   </style>
 </head>
 
-<!-- MODIFICATION: Body is now a flex container to better manage height on mobile -->
-<body class="text-gray-200 overflow-hidden flex flex-col h-screen">
+<!-- MODIFICATION: Body class is simpler, height is controlled by CSS/JS -->
+<body class="text-gray-200 overflow-hidden flex flex-col">
 
-<!-- MODIFICATION: Main container now grows to fill the body instead of a fixed screen height -->
+<!-- MODIFICATION: Main container now grows to fill the body -->
 <div class="flex flex-1 overflow-hidden">
   <!-- Server Icons Sidebar (Desktop only) -->
   <div class="hidden md:flex flex-col items-center w-16 bg-[#202225] p-2 space-y-3">
@@ -86,7 +98,6 @@
   <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden"></div>
 
   <!-- Main Chat Area -->
-  <!-- MODIFICATION: Added min-w-0 as a flexbox safeguard -->
   <div class="flex-1 flex flex-col bg-[#36393f] min-w-0">
     <header class="flex items-center justify-between p-4 shadow-md flex-shrink-0">
       <div class="flex items-center">
@@ -133,6 +144,18 @@
     </div>
 </div>
 
+  <!-- This script MUST run before your main app script -->
+  <script>
+    // Function to set the app height CSS variable based on the window's inner height
+    const setAppHeight = () => {
+      const doc = document.documentElement;
+      doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+    
+    // Set the height on initial load and whenever the window is resized
+    window.addEventListener('resize', setAppHeight);
+    setAppHeight();
+  </script>
 
   <script>
     const API_URL = "https://chatconnect-server.onrender.com";
@@ -164,7 +187,7 @@
       const cancelButton = document.getElementById('cancelButton');
       const confirmButton = document.getElementById('confirmButton');
       
-      // ** NEW: Sidebar Elements for Responsiveness **
+      // Sidebar Elements
       const openSidebarBtn = document.getElementById('openSidebarBtn');
       const closeSidebarBtn = document.getElementById('closeSidebarBtn');
       const mobileSidebar = document.getElementById('mobileSidebar');
@@ -173,7 +196,7 @@
       let currentAction = null;
       let currentMessageId = null;
       
-      // ** NEW: Sidebar Toggle Logic **
+      // Sidebar Toggle Logic
       const openSidebar = () => {
         mobileSidebar.classList.remove('-translate-x-full');
         sidebarBackdrop.classList.remove('hidden');
@@ -191,7 +214,6 @@
       if (user.name) {
         serverIcon.textContent = user.name.charAt(0).toUpperCase();
         onlineUsers.set(user.name, { status: 'online' });
-        // User profile and logout button now correctly placed in the sidebar
         userProfile.innerHTML = `<div class="flex items-center flex-grow min-w-0"><div class="relative"><img class="w-10 h-10 rounded-full" src="https://api.dicebear.com/8.x/adventurer/svg?seed=${user.name}&backgroundColor=transparent" alt="avatar"><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#292b2f] rounded-full"></div></div><div class="ml-3 min-w-0"><p class="font-semibold text-white truncate">${user.name}</p><p class="text-xs text-gray-400">Online</p></div></div><button id="logoutBtn" class="p-2 rounded-full text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors flex-shrink-0" title="Logout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/></svg></button>`;
         const logoutBtn = document.getElementById("logoutBtn");
         logoutBtn.addEventListener("click", () => {
@@ -348,3 +370,4 @@
   </script>
 </body>
 </html>
+
