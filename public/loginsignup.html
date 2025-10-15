@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ChatConnect — Login / Signup</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn-tailwindcss.vercel.app/"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,41 +15,33 @@
       overflow: hidden;
     }
 
-    /* New Animated Background Container */
     .background-container {
       position: fixed;
-      top: -5%; /* Start slightly zoomed in */
+      top: -5%;
       left: -5%;
       width: 110%;
       height: 110%;
       z-index: 0;
-      background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop'); /* A cool, abstract neon image */
+      background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop');
       background-size: cover;
       background-position: center center;
-      /* The subtle pan animation */
       animation: pan-background 60s linear infinite alternate;
     }
 
     @keyframes pan-background {
-      0% {
-        transform: scale(1) translate(0, 0);
-      }
-      100% {
-        transform: scale(1.1) translate(2%, 2%);
-      }
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.1) translate(2%, 2%); }
     }
 
-    /* Dark overlay to make the form pop */
     .background-overlay {
-        position: fixed;
-        inset: 0;
-        background-color: rgba(13, 14, 17, 0.7);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        z-index: 1;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(13, 14, 17, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1;
     }
 
-    /* Main content container */
     .content-container {
       position: relative;
       z-index: 10;
@@ -72,9 +64,7 @@
       color: #e0e0e0;
       transition: all 0.2s ease-in-out;
     }
-    .form-input::placeholder {
-      color: #72767d;
-    }
+    .form-input::placeholder { color: #72767d; }
     .form-input:focus {
       outline: none;
       border-color: #0096fa;
@@ -85,12 +75,9 @@
       background-color: #5865F2;
       transition: background-color 0.2s ease-in-out;
     }
-    .form-button:hover {
-      background-color: #4f5bda;
-    }
+    .form-button:hover { background-color: #4f5bda; }
     
     #message {
-      color: #f87171;
       font-weight: 500;
       min-height: 1.25rem;
     }
@@ -100,9 +87,7 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .toggle-link:hover {
-      text-decoration: underline;
-    }
+    .toggle-link:hover { text-decoration: underline; }
   </style>
 </head>
 
@@ -117,8 +102,9 @@
     </div>
 
     <div class="w-full max-w-md p-8 rounded-lg shadow-lg form-card">
-      <div id="message" class="text-sm text-center mb-4"></div>
+      <div id="message" class="text-sm text-center mb-4 text-red-400"></div>
 
+      <!-- Login Form -->
       <div id="login-form">
         <h2 class="text-2xl font-bold mb-6 text-center text-white">Log In</h2>
         <div class="space-y-4">
@@ -133,6 +119,7 @@
         </p>
       </div>
 
+      <!-- Signup Form -->
       <div id="signup-form" class="hidden">
         <h2 class="text-2xl font-bold mb-6 text-center text-white">Create an Account</h2>
         <div class="space-y-4">
@@ -147,38 +134,67 @@
           Already have an account? <span id="show-login" class="toggle-link">Log in</span>
         </p>
       </div>
+      
+      <!-- Verification Form -->
+      <div id="verify-form" class="hidden">
+        <h2 class="text-2xl font-bold mb-6 text-center text-white">Verify Your Email</h2>
+        <p class="text-center text-gray-400 mb-4">A 4-digit code has been sent to your email address.</p>
+        <div class="space-y-4">
+          <input id="verify-code" class="w-full p-3 rounded-md form-input text-center tracking-[1em]" placeholder="----" maxlength="4" />
+          <button id="verifyBtn" class="w-full p-3 rounded-md text-white font-semibold form-button">
+            Verify & Finish
+          </button>
+        </div>
+         <p class="text-sm text-gray-400 mt-6 text-center">
+          Entered the wrong email? <span id="back-to-signup" class="toggle-link">Go Back</span>
+        </p>
+      </div>
     </div>
   </div>
 
   <script>
-    // --- NO CHANGES TO JAVASCRIPT ---
     const API = "https://chatconnect-server.onrender.com";
 
     const messageEl = document.getElementById('message');
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
+    const verifyForm = document.getElementById('verify-form');
     const showSignupLink = document.getElementById('show-signup');
     const showLoginLink = document.getElementById('show-login');
+    const backToSignupLink = document.getElementById('back-to-signup');
+
     const loginEmailInput = document.getElementById('login-email');
     const loginPasswordInput = document.getElementById('login-password');
     const signupNameInput = document.getElementById('signup-name');
     const signupEmailInput = document.getElementById('signup-email');
     const signupPasswordInput = document.getElementById('signup-password');
+    const verifyCodeInput = document.getElementById('verify-code');
+    
+    let emailForVerification = ''; // Store email for the verify step
 
+    // --- Form Toggle Logic ---
     showSignupLink.addEventListener('click', () => {
       loginForm.classList.add('hidden');
+      verifyForm.classList.add('hidden');
       signupForm.classList.remove('hidden');
       messageEl.textContent = '';
     });
 
     showLoginLink.addEventListener('click', () => {
       signupForm.classList.add('hidden');
+      verifyForm.classList.add('hidden');
       loginForm.classList.remove('hidden');
       messageEl.textContent = '';
     });
+    
+    backToSignupLink.addEventListener('click', () => {
+        showSignupLink.click();
+    });
 
+    // --- API Functions ---
     async function signup() {
       messageEl.textContent = '';
+      messageEl.style.color = '#f87171'; // Default to error color
       const name = signupNameInput.value.trim();
       const email = signupEmailInput.value.trim();
       const password = signupPasswordInput.value;
@@ -194,16 +210,48 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Signup failed');
-        localStorage.setItem('chatconnect_token', data.token);
-        localStorage.setItem('chatconnect_user', JSON.stringify(data.user));
-        window.location.href = 'chat.html';
+        
+        emailForVerification = email;
+        signupForm.classList.add('hidden');
+        verifyForm.classList.remove('hidden');
+        messageEl.textContent = data.message;
+        messageEl.style.color = '#34d399'; // Green for success message
       } catch (e) {
         messageEl.textContent = e.message;
+      }
+    }
+    
+    async function verify() {
+      messageEl.textContent = '';
+      messageEl.style.color = '#f87171';
+      const code = verifyCodeInput.value.trim();
+      if (!code || !emailForVerification) {
+        messageEl.textContent = 'Please enter the verification code.';
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailForVerification, code })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Verification failed');
+        
+        verifyForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        messageEl.textContent = "Verification successful! Please log in.";
+        messageEl.style.color = '#34d399';
+        loginEmailInput.value = emailForVerification; // Pre-fill email for convenience
+        
+      } catch (e) {
+         messageEl.textContent = e.message;
       }
     }
 
     async function login() {
       messageEl.textContent = '';
+      messageEl.style.color = '#f87171';
       const email = loginEmailInput.value.trim();
       const password = loginPasswordInput.value;
       if (!email || !password) {
@@ -226,8 +274,11 @@
       }
     }
 
+    // --- Event Listeners ---
     document.getElementById('signupBtn').addEventListener('click', signup);
+    document.getElementById('verifyBtn').addEventListener('click', verify);
     document.getElementById('loginBtn').addEventListener('click', login);
   </script>
 </body>
 </html>
+
