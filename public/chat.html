@@ -12,14 +12,12 @@
 
   <style>
     :root {
-      /* This CSS variable will be set by JavaScript to the actual visible height */
       --app-height: 100vh;
     }
 
     body {
       font-family: 'Inter', sans-serif;
       background-color: #18191c;
-      /* Use the dynamic height variable */
       height: var(--app-height);
     }
     
@@ -70,7 +68,6 @@
         height: 80px;
     }
 
-    /* NEW: Styles for popovers and replies */
     .popover {
         display: none;
         position: absolute;
@@ -79,6 +76,11 @@
     }
     .message-content:hover .popover {
         display: flex;
+    }
+    .emoji-picker {
+        display: none;
+        position: absolute;
+        z-index: 20; /* Higher than other popovers */
     }
     .reply-quote {
         border-left: 2px solid #4f545c;
@@ -142,7 +144,6 @@
     </main>
     
     <footer class="p-4 flex-shrink-0">
-      <!-- NEW: Reply Indicator -->
       <div id="replyingToContainer" class="hidden items-center justify-between bg-[#2f3136] px-4 py-1.5 rounded-t-lg -mb-1">
         <div class="text-sm text-gray-300">
           Replying to <strong id="replyingToUser" class="text-white"></strong>
@@ -168,6 +169,16 @@
       </div>
     </footer>
   </div>
+</div>
+
+<!-- NEW: Emoji Picker Popover -->
+<div id="emojiPicker" class="emoji-picker bg-[#202225] p-2 rounded-lg shadow-xl gap-2">
+    <button class="emoji-option text-xl">👍</button>
+    <button class="emoji-option text-xl">❤️</button>
+    <button class="emoji-option text-xl">😂</button>
+    <button class="emoji-option text-xl">😮</button>
+    <button class="emoji-option text-xl">😢</button>
+    <button class="emoji-option text-xl">🙏</button>
 </div>
 
 <!-- Profile Modal -->
@@ -255,23 +266,12 @@
       const replyingToContainer = document.getElementById('replyingToContainer');
       const replyingToUser = document.getElementById('replyingToUser');
       const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+      const emojiPicker = document.getElementById('emojiPicker');
 
       let currentAction = null;
       let currentMessageId = null;
-      let replyToMessageId = null; // NEW: Track which message we are replying to
-      
-      if (user.name) {
-        serverIcon.textContent = user.name.charAt(0).toUpperCase();
-        onlineUsers.set(user.name, { status: 'online' });
-        userProfile.innerHTML = `<div class="flex items-center flex-grow min-w-0"><div class="relative"><img class="w-10 h-10 rounded-full" src="https://api.dicebear.com/8.x/adventurer/svg?seed=${user.name}&backgroundColor=transparent" alt="avatar"><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#292b2f] rounded-full"></div></div><div class="ml-3 min-w-0"><p class="font-semibold text-white truncate">${user.name}</p><p class="text-xs text-gray-400">Online</p></div></div><button id="logoutBtn" class="p-2 rounded-full text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors flex-shrink-0" title="Logout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/></svg></button>`;
-        const logoutBtn = document.getElementById("logoutBtn");
-        logoutBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          localStorage.removeItem("chatconnect_token");
-          localStorage.removeItem("chatconnect_user");
-          window.location.href = "index.html";
-        });
-      }
+      let replyToMessageId = null;
+      let messageIdToReactTo = null; // NEW: Track which message is getting a reaction
 
       function appendMessage(msg, isNew = true) {
         const { id, username: sender, text, timestamp, reactions, originalMessage } = msg;
@@ -293,22 +293,11 @@
             </div>
         ` : '';
 
-        const reactionsHTML = (reactions && reactions.length > 0) ? `
-            <div class="absolute bottom-[-10px] ${isMe ? 'right-12' : 'left-12'} flex gap-1">
-                ${[...new Set(reactions.map(r => r.emoji))].map(emoji => {
-                    const count = reactions.filter(r => r.emoji === emoji).length;
-                    const didIReact = reactions.some(r => r.emoji === emoji && r.userId === user.id);
-                    return `<button class="reaction-btn ${didIReact ? 'bg-blue-800' : 'bg-gray-700'} rounded-full px-2 py-0.5 text-xs flex items-center gap-1 hover:scale-110 transition-transform" data-message-id="${id}" data-emoji="${emoji}">
-                        <span>${emoji}</span>
-                        <span>${count}</span>
-                    </button>`
-                }).join('')}
-            </div>
-        ` : '';
-
         const popoverHTML = `
             <div class="popover absolute top-[-16px] ${isMe ? 'left-[-80px]' : 'right-[-80px]'} bg-[#202225] p-1 rounded-md shadow-lg gap-1">
-                <button class="action-btn text-gray-300 hover:text-white p-1" title="Add Reaction" data-action="react" data-message-id="${id}">😀</button>
+                <button class="action-btn text-gray-300 hover:text-white p-1" title="Add Reaction" data-action="react" data-message-id="${id}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </button>
                 <button class="action-btn text-gray-300 hover:text-white p-1" title="Reply" data-action="reply" data-message-id="${id}" data-username="${sender}">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                 </button>
@@ -328,14 +317,37 @@
                     <p class="leading-relaxed break-words">${text}</p>
                     ${popoverHTML}
                 </div>
-                ${reactionsHTML}
+                <div class="reactions-container absolute bottom-[-10px] ${isMe ? 'right-12' : 'left-12'} flex gap-1"></div>
             </div>`;
 
         messageElement.innerHTML = `${avatarHTML}<div>${bubbleHTML}</div>`;
         chatBox.appendChild(messageElement);
+        updateReactionsUI(id, reactions || []); // NEW: Call to render reactions
         if (isNew) chatBox.scrollTop = chatBox.scrollHeight;
       }
-      
+
+      function updateReactionsUI(messageId, reactions) {
+        const msgElement = document.getElementById(messageId);
+        if (!msgElement) return;
+
+        const container = msgElement.querySelector('.reactions-container');
+        if (!container) return;
+
+        if (!reactions || reactions.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = [...new Set(reactions.map(r => r.emoji))].map(emoji => {
+            const count = reactions.filter(r => r.emoji === emoji).length;
+            const didIReact = reactions.some(r => r.emoji === emoji && r.userId === user.id);
+            return `<button class="reaction-btn ${didIReact ? 'bg-blue-800' : 'bg-gray-700'} rounded-full px-2 py-0.5 text-xs flex items-center gap-1 hover:scale-110 transition-transform" data-message-id="${messageId}" data-emoji="${emoji}">
+                <span>${emoji}</span>
+                <span>${count}</span>
+            </button>`
+        }).join('');
+      }
+
       chatBox.addEventListener('click', (e) => {
         const actionButton = e.target.closest('.action-btn');
         const reactionButton = e.target.closest('.reaction-btn');
@@ -345,10 +357,14 @@
             const action = actionButton.dataset.action;
             const username = actionButton.dataset.username;
 
-            if (action === 'delete-everyone' || action === 'delete-local') {
+            if (action === 'delete-everyone') {
                 openModal(action, messageId);
             } else if (action === 'react') {
-                socket.emit('reactToMessage', { messageId, emoji: '😀' });
+                messageIdToReactTo = messageId;
+                const rect = actionButton.getBoundingClientRect();
+                emojiPicker.style.display = 'flex';
+                emojiPicker.style.top = `${rect.top - 50}px`;
+                emojiPicker.style.left = `${rect.left - 80}px`;
             } else if (action === 'reply') {
                 replyToMessageId = messageId;
                 replyingToUser.textContent = username;
@@ -366,6 +382,23 @@
             socket.emit('reactToMessage', { messageId, emoji });
         }
       });
+      
+      emojiPicker.addEventListener('click', (e) => {
+        const emojiButton = e.target.closest('.emoji-option');
+        if (emojiButton && messageIdToReactTo) {
+            const emoji = emojiButton.textContent;
+            socket.emit('reactToMessage', { messageId: messageIdToReactTo, emoji });
+            messageIdToReactTo = null;
+            emojiPicker.style.display = 'none';
+        }
+      });
+
+      document.body.addEventListener('click', (e) => {
+        if (!emojiPicker.contains(e.target) && !e.target.closest('[data-action="react"]')) {
+            emojiPicker.style.display = 'none';
+        }
+      }, true);
+
 
       cancelReplyBtn.addEventListener('click', () => {
         replyToMessageId = null;
@@ -385,37 +418,7 @@
       });
       
       socket.on('messageReacted', ({ messageId, reactions }) => {
-          const msgElement = document.getElementById(`message-${messageId}`);
-          if (msgElement) {
-              const msgData = {
-                  id: messageId,
-                  username: msgElement.querySelector('.font-bold')?.textContent || user.name,
-                  text: msgElement.querySelector('p.leading-relaxed').textContent,
-                  timestamp: new Date().toISOString(),
-                  reactions,
-                  originalMessage: msgElement.querySelector('.reply-quote') ? {
-                      username: msgElement.querySelector('.reply-quote strong').textContent,
-                      text: msgElement.querySelector('.reply-quote p').textContent,
-                  } : null
-              };
-              const scrollPosition = chatBox.scrollTop;
-              const isScrolledToBottom = chatBox.scrollHeight - chatBox.clientHeight <= chatBox.scrollTop + 1;
-
-              // Replace the old message element with the updated one
-              const oldElement = document.getElementById(`message-${messageId}`);
-              if (oldElement) {
-                const newElement = document.createElement('div');
-                appendMessage(msgData, false);
-                const finalNewElement = chatBox.lastChild;
-                oldElement.replaceWith(finalNewElement);
-              }
-              
-              if(isScrolledToBottom){
-                  chatBox.scrollTop = chatBox.scrollHeight;
-              } else {
-                  chatBox.scrollTop = scrollPosition;
-              }
-          }
+          updateReactionsUI(messageId, reactions);
       });
       
       function sendMessage() {
