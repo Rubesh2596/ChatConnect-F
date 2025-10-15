@@ -1,7 +1,7 @@
 // ======================
 // CONFIG
 // ======================
-const API_URL = "http://localhost:3000"; // backend URL
+const API_URL = "https://chatconnect-server.onrender.com"; // backend URL
 const token = localStorage.getItem("chatconnect_token");
 const user = JSON.parse(localStorage.getItem("chatconnect_user") || "{}");
 
